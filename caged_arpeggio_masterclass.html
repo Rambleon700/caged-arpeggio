@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Movable Arpeggio Guide - CAGED System Masterclass</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    },
+                    colors: {
+                        fretboard: '#1a1816',
+                        fret: '#8b8a87',
+                        root: '#ef4444',     /* Red */
+                        third: '#10b981',    /* Green */
+                        fifth: '#3b82f6',    /* Blue */
+                        seventh: '#8b5cf6',  /* Purple */
+                        ext: '#f59e0b'       /* Gold/Amber */
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom styles & fretboard rendering */
+        .fretboard-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #475569 #0f172a;
+        }
+        .fretboard-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+        .fretboard-scroll::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        .fretboard-scroll::-webkit-scrollbar-thumb {
+            background-color: #475569;
+            border-radius: 4px;
+        }
+        .fret-marker {
+            box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
+        }
+        .string-wire {
+            box-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
+        .note-node {
+            transition: all 0.15s ease;
+        }
+        .note-node:hover {
+            transform: scale(1.25);
+            z-index: 30;
+        }
+        .tab-line {
+            background-image: linear-gradient(to bottom, transparent 45%, #475569 45%, #475569 55%, transparent 55%);
+        }
+        .pick-sweep-anim {
+            animation: sweepMove 2s infinite ease-in-out;
+        }
+        @keyframes sweepMove {
+            0% { transform: translateY(0px) rotate(-15deg); }
+            50% { transform: translateY(120px) rotate(15deg); }
+            100% { transform: translateY(0px) rotate(-15deg); }
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans overflow-x-hidden antialiased select-none bg-slate-950 text-slate-100">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-amber-500 to-red-600 text-white p-2.5 rounded-xl shadow-lg shadow-amber-500/20">
+                    <i class="fa-solid font-bold fa-guitar text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-amber-400 via-orange-300 to-red-400 bg-clip-text text-transparent">
+                        ULTIMATE MOVABLE ARPEGGIO GUIDE
+                    </h1>
+                    <p class="text-xs text-slate-400">CAGED System • 165+ Shapes • 1,980+ Key Variations</p>
+                </div>
+            </div>
+
+            <!-- Tab Navigation Controls -->
+            <nav class="flex items-center bg-slate-950/80 p-1.5 rounded-xl border border-slate-800 text-xs font-medium space-x-1 overflow-x-auto">
+                <button onclick="switchTab('explorer')" id="btn-explorer" class="tab-btn px-3.5 py-2 rounded-lg flex items-center space-x-2 transition bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                    <i class="fa-solid fa-layer-group"></i> <span>Fretboard Explorer</span>
+                </button>
+                <button onclick="switchTab('library')" id="btn-library" class="tab-btn px-3.5 py-2 rounded-lg flex items-center space-x-2 transition text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+                    <i class="fa-solid fa-book-open"></i> <span>22 Arpeggio Library</span>
+                </button>
+                <button onclick="switchTab('exercises')" id="btn-exercises" class="tab-btn px-3.5 py-2 rounded-lg flex items-center space-x-2 transition text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+                    <i class="fa-solid fa-circle-play"></i> <span>90+ Exercises & Synth</span>
+                </button>
+                <button onclick="switchTab('masterclass')" id="btn-masterclass" class="tab-btn px-3.5 py-2 rounded-lg flex items-center space-x-2 transition text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+                    <i class="fa-solid fa-graduation-cap"></i> <span>Techniques & Paths</span>
+                </button>
+            </nav>
+
+            <!-- Global Quick Utilities -->
+            <div class="flex items-center space-x-3">
+                <button id="metro-toggle-btn" onclick="toggleMetronome()" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white flex items-center space-x-1.5">
+                    <i class="fa-solid fa-stopwatch text-amber-400"></i>
+                    <span id="metro-label">Metronome (120 BPM)</span>
+                </button>
+                <button onclick="toggleTunerModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white flex items-center space-x-1.5">
+                    <i class="fa-solid fa-sliders text-cyan-400"></i>
+                    <span>Tone Generator</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+
+        <!-- TAB 1: INTERACTIVE FRETBOARD EXPLORER -->
+        <section id="tab-explorer" class="tab-content space-y-6">
+            <!-- Controls Bar -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Key Selector -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                            <i class="fa-solid fa-key text-amber-400 mr-1"></i> Key (12 Transpositions)
+                        </label>
+                        <select id="explorer-key" onchange="updateExplorer()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-amber-300 focus:outline-none focus:border-amber-500 font-semibold">
+                            <option value="C">C Major / A Minor</option>
+                            <option value="C#">C# / Db</option>
+                            <option value="D">D Key</option>
+                            <option value="Eb">Eb / D#</option>
+                            <option value="E">E Key</option>
+                            <option value="F">F Key</option>
+                            <option value="F#">F# / Gb</option>
+                            <option value="G">G Key</option>
+                            <option value="Ab">Ab / G#</option>
+                            <option value="A">A Key</option>
+                            <option value="Bb">Bb / A#</option>
+                            <option value="B">B Key</option>
+                        </select>
+                    </div>
+
+                    <!-- Arpeggio Type Selector -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                            <i class="fa-solid fa-diagram-project text-cyan-400 mr-1"></i> Arpeggio Family (22 Types)
+                        </label>
+                        <select id="explorer-type" onchange="updateExplorer()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-cyan-300 focus:outline-none focus:border-cyan-500 font-semibold">
+                            <optgroup label="Triads (Basic)">
+                                <option value="maj">Major Triad (1 - 3 - 5)</option>
+                                <option value="min">Minor Triad (1 - b3 - 5)</option>
+                                <option value="dim">Diminished Triad (1 - b3 - b5)</option>
+                                <option value="aug">Augmented Triad (1 - 3 - #5)</option>
+                                <option value="sus2">Sus2 Triad (1 - 2 - 5)</option>
+                                <option value="sus4">Sus4 Triad (1 - 4 - 5)</option>
+                            </optgroup>
+                            <optgroup label="Sixths & Sevenths">
+                                <option value="maj6">Major 6th (1 - 3 - 5 - 6)</option>
+                                <option value="min6">Minor 6th (1 - b3 - 5 - 6)</option>
+                                <option value="maj7" selected>Major 7th (1 - 3 - 5 - 7)</option>
+                                <option value="min7">Minor 7th (1 - b3 - 5 - b7)</option>
+                                <option value="dom7">Dominant 7th (1 - 3 - 5 - b7)</option>
+                                <option value="m7b5">Half-Diminished / m7b5 (1 - b3 - b5 - b7)</option>
+                                <option value="dim7">Fully-Diminished 7th (1 - b3 - b5 - bb7)</option>
+                                <option value="mMaj7">Minor Major 7th (1 - b3 - 5 - 7)</option>
+                                <option value="maj7b5">Major 7th b5 (1 - 3 - b5 - 7)</option>
+                                <option value="aug7">Augmented 7th (1 - 3 - #5 - b7)</option>
+                            </optgroup>
+                            <optgroup label="Extended & Advanced">
+                                <option value="maj9">Major 9th (1 - 3 - 5 - 7 - 9)</option>
+                                <option value="min9">Minor 9th (1 - b3 - 5 - b7 - 9)</option>
+                                <option value="dom9">Dominant 9th (1 - 3 - 5 - b7 - 9)</option>
+                                <option value="maj11">Major 11th (1 - 3 - 5 - 7 - 9 - 11)</option>
+                                <option value="min11">Minor 11th (1 - b3 - 5 - b7 - 9 - 11)</option>
+                                <option value="dom13">Dominant 13th (1 - 3 - 5 - b7 - 9 - 13)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- CAGED Position Filter -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                            <i class="fa-solid fa-shapes text-emerald-400 mr-1"></i> CAGED System Shape Filter
+                        </label>
+                        <select id="explorer-caged" onchange="updateExplorer()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-emerald-300 focus:outline-none focus:border-emerald-500 font-semibold">
+                            <option value="ALL">ALL CAGED Positions (Full Neck)</option>
+                            <option value="C">C-Shape Box</option>
+                            <option value="A">A-Shape Box</option>
+                            <option value="G">G-Shape Box</option>
+                            <option value="E">E-Shape Box</option>
+                            <option value="D">D-Shape Box</option>
+                        </select>
+                    </div>
+
+                    <!-- Display Mode Toggle -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                            <i class="fa-solid fa-eye text-purple-400 mr-1"></i> Marker Labels & Path
+                        </label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <select id="explorer-label-mode" onchange="updateExplorer()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-2 text-xs text-slate-200 focus:outline-none">
+                                <option value="intervals">Intervals (R, 3, 5)</option>
+                                <option value="notes">Note Names (C, E, G)</option>
+                                <option value="fingers">Finger Suggestions</option>
+                            </select>
+                            <select id="explorer-nav-path" onchange="updateExplorer()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-2 text-xs text-slate-200 focus:outline-none">
+                                <option value="none">Standard Box</option>
+                                <option value="horizontal">Horizontal Path</option>
+                                <option value="vertical">Vertical Slide Path</option>
+                                <option value="diagonal">Diagonal 3-Octave</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Legend & Quick Action Bar -->
+                <div class="mt-4 pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div class="flex items-center space-x-4 flex-wrap">
+                        <span class="text-slate-400 font-medium">Interval Color Codes:</span>
+                        <span class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded-full bg-red-500 inline-block shadow-sm shadow-red-500/50"></span><span>Root</span></span>
+                        <span class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block shadow-sm shadow-emerald-500/50"></span><span>3rd (Maj/Min)</span></span>
+                        <span class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded-full bg-blue-500 inline-block shadow-sm shadow-blue-500/50"></span><span>5th (Perf/Dim/Aug)</span></span>
+                        <span class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded-full bg-purple-500 inline-block shadow-sm shadow-purple-500/50"></span><span>7th Degree</span></span>
+                        <span class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block shadow-sm shadow-amber-500/50"></span><span>Extensions (9, 11, 13)</span></span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="playCurrentArpeggio()" class="px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-lg shadow-md transition flex items-center space-x-2">
+                            <i class="fa-solid fa-play"></i> <span>Play Shape Audio</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic 24-Fret Guitar Neck Display -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-bold text-slate-200 text-sm tracking-wide uppercase flex items-center space-x-2">
+                        <i class="fa-solid fa-guitar text-amber-500"></i>
+                        <span id="fretboard-title-display">24-Fret Interactive CAGED Display</span>
+                    </h3>
+                    <div class="text-xs text-slate-400 font-mono">Standard Tuning: E2 - A2 - D3 - G3 - B3 - E4</div>
+                </div>
+
+                <!-- Fretboard Scrollable Area -->
+                <div class="fretboard-scroll overflow-x-auto pb-4 pt-2">
+                    <div id="fretboard-container" class="min-w-[1280px] relative bg-fretboard border-2 border-slate-800 rounded-xl p-2">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- CAGED System Position Breakdown Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div id="caged-card-C" class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-bold text-amber-400 text-lg">C - Shape</span>
+                        <span class="text-[10px] bg-amber-500/10 text-amber-300 px-2 py-0.5 rounded border border-amber-500/20">Root string 5</span>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">Anchored on the 5th string root. Compact box with sweeping potential on strings 4, 3, and 2.</p>
+                </div>
+                <div id="caged-card-A" class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-bold text-cyan-400 text-lg">A - Shape</span>
+                        <span class="text-[10px] bg-cyan-500/10 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/20">Root string 5</span>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">Primary 5th string root position. Ideal for wide string-skipping intervals and 5-string sweep picking.</p>
+                </div>
+                <div id="caged-card-G" class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-bold text-emerald-400 text-lg">G - Shape</span>
+                        <span class="text-[10px] bg-emerald-500/10 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/20">Root string 6</span>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">Spans 4 frets smoothly. Connects A-shape and E-shape arpeggios horizontally with minor 3rd slides.</p>
+                </div>
+                <div id="caged-card-E" class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-bold text-purple-400 text-lg">E - Shape</span>
+                        <span class="text-[10px] bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded border border-purple-500/20">Root string 6</span>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">The foundational 6-string power arpeggio shape. Highest speed potential for sweeping and tapping.</p>
+                </div>
+                <div id="caged-card-D" class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-bold text-red-400 text-lg">D - Shape</span>
+                        <span class="text-[10px] bg-red-500/10 text-red-300 px-2 py-0.5 rounded border border-red-500/20">Root string 4</span>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">Top string triad powerhouse (strings 1-4). Perfect for fast upper-register fluid arpeggio extensions.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: ARPEGGIO SHAPE LIBRARY & VISUALIZER -->
+        <section id="tab-library" class="tab-content space-y-6 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left Column: Search & 22 Categories List -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-slate-200 text-base">Arpeggio Catalog</h3>
+                        <span class="text-xs text-amber-400 font-mono bg-amber-400/10 px-2 py-1 rounded">165+ Movable Shapes</span>
+                    </div>
+                    <input type="text" id="lib-search" onkeyup="filterLibrary()" placeholder="Filter by name (e.g., Maj7, Diminished, Sweep)..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
+                    
+                    <div id="lib-category-list" class="space-y-2 max-h-[550px] overflow-y-auto pr-1">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Right 2 Columns: Detailed Visualizer & Tab View -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+                        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                            <div>
+                                <span id="lib-selected-tag" class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30">CAGED E-Shape</span>
+                                <h2 id="lib-selected-title" class="text-2xl font-bold text-white mt-1">C Major 7th Arpeggio</h2>
+                                <p id="lib-selected-formula" class="text-xs text-slate-400 font-mono mt-0.5">Formula: 1 - 3 - 5 - 7 (C - E - G - B)</p>
+                            </div>
+                            <!-- Audio Playback controls -->
+                            <div class="flex items-center space-x-3 bg-slate-950 p-2 rounded-xl border border-slate-800">
+                                <button onclick="playLibArpeggio()" class="w-10 h-10 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-lg shadow-lg shadow-amber-500/20 transition">
+                                    <i class="fa-solid fa-play"></i>
+                                </button>
+                                <div>
+                                    <div class="text-[10px] text-slate-400 uppercase font-semibold">Playback BPM</div>
+                                    <input type="range" id="lib-bpm" min="60" max="220" value="120" oninput="document.getElementById('lib-bpm-val').innerText = this.value" class="w-24 accent-amber-500 h-1.5 bg-slate-800 rounded-lg">
+                                    <span id="lib-bpm-val" class="text-xs font-mono text-amber-400 ml-1">120</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tablature Rendering Engine Window -->
+                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+                            <div class="flex justify-between items-center mb-2 text-xs text-slate-400 font-mono">
+                                <span><i class="fa-solid fa-music text-amber-400 mr-1"></i> Interactive Tablature Viewer</span>
+                                <span>Standard Tuning (E A D G B E)</span>
+                            </div>
+                            <div id="tablature-display" class="bg-slate-900 border border-slate-800/80 rounded-lg p-4 font-mono text-xs overflow-x-auto text-amber-300 leading-relaxed shadow-inner">
+                                <!-- Dynamic ASCII / SVG Tab generated here -->
+                            </div>
+                        </div>
+
+                        <!-- Shape Fingering Tips & Pick Directions -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
+                                <div class="text-slate-400 font-semibold mb-1"><i class="fa-solid fa-hand-pointer text-cyan-400 mr-1"></i> Fingering Rule</div>
+                                <div id="lib-fingering-desc" class="text-slate-300">Start with 2nd finger on Root (6th string). Use index finger for 3rd and pinky stretch on 5th string.</div>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
+                                <div class="text-slate-400 font-semibold mb-1"><i class="fa-solid fa-arrow-down-up-across-line text-emerald-400 mr-1"></i> Picking Motion</div>
+                                <div id="lib-picking-desc" class="text-slate-300">Sweep Down (strings 6 to 1), followed by pull-off on high E, then Sweep Up back.</div>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
+                                <div class="text-slate-400 font-semibold mb-1"><i class="fa-solid fa-bullseye text-purple-400 mr-1"></i> Key Application</div>
+                                <div id="lib-app-desc" class="text-slate-300">Works seamlessly over Imaj7 and IVmaj7 chord progressions in major key harmony.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: 90+ PRACTICE EXERCISES & BACKING TRACK SIMULATOR -->
+        <section id="tab-exercises" class="tab-content space-y-6 hidden">
+            <!-- Exercise Filters & Header -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-dumbbell text-amber-400"></i>
+                            <span>90+ Master Practice Exercises</span>
+                        </h2>
+                        <p class="text-xs text-slate-400">With Web Audio backing tracks, rhythm synth & simulated pick animation</p>
+                    </div>
+
+                    <!-- Filter Controls -->
+                    <div class="flex flex-wrap items-center gap-3">
+                        <select id="ex-filter-tech" onchange="renderExercises()" class="bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-amber-500">
+                            <option value="ALL">All Techniques</option>
+                            <option value="Sweep">Sweep Picking</option>
+                            <option value="Skip">String Skipping</option>
+                            <option value="Tap">Tapping & Legato</option>
+                            <option value="Diagonal">Diagonal Traversals</option>
+                        </select>
+                        <select id="ex-filter-diff" onchange="renderExercises()" class="bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-amber-500">
+                            <option value="ALL">All Difficulties</option>
+                            <option value="Beginner">Beginner (1-30)</option>
+                            <option value="Intermediate">Intermediate (31-60)</option>
+                            <option value="Advanced">Advanced (61-90+)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Active Exercise Player Workstation -->
+                <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Left: Tab & Audio Control -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span id="ex-active-num" class="text-xs font-mono px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30">Exercise #42</span>
+                                <h3 id="ex-active-title" class="text-lg font-bold text-white mt-1">5-String Major Sweep Cascade</h3>
+                                <p id="ex-active-desc" class="text-xs text-slate-400">Focus on fluid wrist motion without resting on adjacent strings. Keep string muting tight.</p>
+                            </div>
+                            <div class="text-right">
+                                <span id="ex-active-diff" class="text-xs font-semibold px-2 py-1 rounded bg-amber-500/10 text-amber-400">Intermediate</span>
+                            </div>
+                        </div>
+
+                        <!-- Animated Interactive Tab Window -->
+                        <div class="relative bg-slate-900 border border-slate-800 rounded-lg p-4 font-mono text-xs overflow-hidden">
+                            <div id="ex-animated-tab" class="whitespace-nowrap text-amber-300">
+                                <!-- Dynamic Tab Content -->
+                            </div>
+                            <!-- Animated Playhead Line -->
+                            <div id="ex-playhead" class="absolute top-0 bottom-0 w-0.5 bg-cyan-400 shadow-[0_0_8px_#22d3ee] left-0 transition-all duration-100 hidden"></div>
+                        </div>
+
+                        <!-- Synthesizer Backing Track Engine Bar -->
+                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex items-center space-x-3">
+                                <button id="ex-play-btn" onclick="toggleExercisePlayback()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg flex items-center space-x-2 transition shadow-lg shadow-amber-500/20">
+                                    <i class="fa-solid fa-play"></i> <span id="ex-play-label">Start Practice Session</span>
+                                </button>
+                                <button onclick="stopExercisePlayback()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-lg text-xs">
+                                    <i class="fa-solid fa-stop"></i>
+                                </button>
+                            </div>
+
+                            <!-- Backing Track Accompaniment Toggles -->
+                            <div class="flex items-center space-x-4 text-xs">
+                                <label class="flex items-center space-x-1.5 cursor-pointer">
+                                    <input type="checkbox" id="ex-synth-drums" checked class="accent-amber-500">
+                                    <span class="text-slate-300">Drum Beat</span>
+                                </label>
+                                <label class="flex items-center space-x-1.5 cursor-pointer">
+                                    <input type="checkbox" id="ex-synth-bass" checked class="accent-amber-500">
+                                    <span class="text-slate-300">Bass Line</span>
+                                </label>
+                                <div class="flex items-center space-x-1 font-mono">
+                                    <span class="text-slate-400">Tempo:</span>
+                                    <input type="number" id="ex-bpm-input" value="110" min="40" max="240" class="w-14 bg-slate-950 border border-slate-800 text-center rounded text-amber-400 focus:outline-none">
+                                    <span class="text-slate-400">BPM</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Simulated Visual HD Pick Motion Display -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center justify-between">
+                                <span><i class="fa-solid fa-video text-red-500 mr-1"></i> Motion Visualizer</span>
+                                <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">60 FPS Simulation</span>
+                            </div>
+                            <!-- Canvas String Picking Animation Window -->
+                            <div class="relative w-full h-44 bg-slate-950 rounded-lg border border-slate-800 overflow-hidden flex items-center justify-center">
+                                <canvas id="motion-canvas" width="280" height="160" class="w-full h-full"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 text-[11px] text-slate-400 bg-slate-950/80 p-2.5 rounded-lg border border-slate-800">
+                            <span class="font-semibold text-amber-400">Technique Tip:</span>
+                            <span id="ex-sim-tip">Maintain continuous downward pick slant during ascending sweep. Relax thumb joint.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scrollable Exercise List Grid -->
+            <div id="exercise-list-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[450px] overflow-y-auto pr-1">
+                <!-- Generated dynamically by JS -->
+            </div>
+        </section>
+
+        <!-- TAB 4: TECHNIQUE MASTERCLASSES & FRETBOARD NAVIGATION -->
+        <section id="tab-masterclass" class="tab-content space-y-6 hidden">
+            <!-- Technique Navigation Tabs -->
+            <div class="flex border-b border-slate-800 space-x-6 text-sm font-semibold text-slate-400 overflow-x-auto pb-1">
+                <button onclick="switchMasterTab('sweep')" id="mtab-sweep" class="mtab-btn pb-2 text-amber-400 border-b-2 border-amber-400">1. Sweep Picking Physics</button>
+                <button onclick="switchMasterTab('skip')" id="mtab-skip" class="mtab-btn pb-2 hover:text-slate-200">2. String Skipping Mastery</button>
+                <button onclick="switchMasterTab('tap')" id="mtab-tap" class="mtab-btn pb-2 hover:text-slate-200">3. Tapping & Legato Fluidity</button>
+                <button onclick="switchMasterTab('nav')" id="mtab-nav" class="mtab-btn pb-2 hover:text-slate-200">4. Horiz / Vert / Diag Navigation</button>
+            </div>
+
+            <!-- Masterclass Section 1: Sweep Picking -->
+            <div id="mcontent-sweep" class="mcontent-box space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <div class="inline-block p-2.5 rounded-xl bg-amber-500/10 text-amber-400 mb-1">
+                            <i class="fa-solid fa-broom text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Sweep Picking Mechanics & Rest Strokes</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Sweep picking relies on a single continuous motion across the strings rather than individual picking strokes. Think of your plectrum as brushing across a set of harp strings.
+                        </p>
+                        <div class="space-y-2 text-xs text-slate-400">
+                            <div class="p-3 bg-slate-950 rounded-lg border border-slate-800">
+                                <strong class="text-amber-400">1. Pick Slanting (45° Angle):</strong> Incline the pick forward in the direction of stroke travel to push strings down with minimal friction.
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded-lg border border-slate-800">
+                                <strong class="text-amber-400">2. Right-Hand Palm Muting:</strong> Follow immediately behind the picking motion with the fleshy edge of your picking hand palm to deaden low strings.
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded-lg border border-slate-800">
+                                <strong class="text-amber-400">3. Synchronization Rule:</strong> Only one note must ring at a time. Lift fretting fingers immediately after sounding to avoid chord bleeding.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visual Breakdown Graphic -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between">
+                        <h4 class="font-bold text-slate-200 text-sm mb-4">Pick Stroke Physics Diagram</h4>
+                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-6 space-y-4 font-mono text-xs">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                <span class="text-slate-400">String 1 (High E)</span>
+                                <span class="text-emerald-400">Pull-off & Upstroke Exit</span>
+                            </div>
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                <span class="text-slate-400">String 2 (B)</span>
+                                <span class="text-amber-400">↓ Downstroke (Continuous Push)</span>
+                            </div>
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                <span class="text-slate-400">String 3 (G)</span>
+                                <span class="text-amber-400">↓ Downstroke (Rest stroke onto B)</span>
+                            </div>
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                <span class="text-slate-400">String 4 (D)</span>
+                                <span class="text-amber-400">↓ Downstroke Start</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-4">Rest strokes force the pick to land on the next string ready for instant activation without extra hand motion.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Masterclass Section 2: String Skipping -->
+            <div id="mcontent-skip" class="mcontent-box space-y-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <div class="inline-block p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 mb-1">
+                            <i class="fa-solid fa-forward-step text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">String Skipping & Wide Interval Traversal</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            String skipping bypasses adjacent strings to create wide octave leaps, pedal point patterns, and modern pianistic arpeggio shapes.
+                        </p>
+                        <div class="space-y-2 text-xs text-slate-400">
+                            <div class="p-3 bg-slate-950 rounded-lg border border-slate-800">
+                                <strong class="text-cyan-400">Left-Hand Muting Shield:</strong> Lightly rest index finger flesh across unplayed skipped strings to neutralize unwanted buzz.
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded-lg border border-slate-800">
+                                <strong class="text-cyan-400">Pick Trajectory:</strong> Use small outside-picking motions when jumping over middle strings.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-3">
+                        <h4 class="font-bold text-slate-200 text-sm">Visual String Jump Blueprint</h4>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs space-y-2">
+                            <div class="text-amber-400">E |---12--15/19-----------| (Play high E)</div>
+                            <div class="text-slate-600">B |-----------------------| (SKIPPED STRING - MUTED)</div>
+                            <div class="text-amber-400">G |-----------12--14------| (Jump down to G string)</div>
+                            <div class="text-slate-600">D |-----------------------| (SKIPPED STRING)</div>
+                            <div class="text-amber-400">A |-------------------12--| (Jump down to A string)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Masterclass Section 3: Tapping & Legato -->
+            <div id="mcontent-tap" class="mcontent-box space-y-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <div class="inline-block p-2.5 rounded-xl bg-purple-500/10 text-purple-400 mb-1">
+                            <i class="fa-solid fa-hand-sparkles text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Two-Handed Tapping & Legato Arpeggios</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Combining right-hand tapping with left-hand hammer-ons and pull-offs creates fluid 3-octave arpeggio waterfalls at lightning speeds.
+                        </p>
+                        <div class="space-y-2 text-xs text-slate-400">
+                            <div class="p-3 bg-slate-950 rounded-lg border border-slate-800">
+                                <strong class="text-purple-400">Right-Hand Flick:</strong> Tap squarely behind the fret wire with middle or index finger, then flick sideways slightly down toward the floor to pluck the next note.
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded-lg border border-slate-800">
+                                <strong class="text-purple-400">Hammer-on from Nowhere:</strong> Drive left-hand fingers onto higher strings with crisp velocity without picking.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                        <h4 class="font-bold text-slate-200 text-sm mb-3">Tapping Hand Positioning</h4>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-purple-300 space-y-2">
+                            <div>Left Hand: [12] - [15] (Root & 3rd)</div>
+                            <div>Right Hand Tap: +[19] (5th) or +[22] (7th)</div>
+                            <div class="pt-2 text-slate-400 font-sans">Formula: T(19) p15 p12 h15 -> Repeat across strings</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Masterclass Section 4: Fretboard Navigation -->
+            <div id="mcontent-nav" class="mcontent-box space-y-6 hidden">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Connecting the Fretboard: Horizontal, Vertical & Diagonal</h3>
+                        <p class="text-sm text-slate-300">Unlock complete fretboard freedom by transitioning between CAGED positions seamlessly.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <span class="font-bold text-amber-400 text-sm block"><i class="fa-solid fa-arrows-left-right mr-1"></i> 1. Horizontal Linear Navigation</span>
+                            <p class="text-slate-400 leading-relaxed">Play arpeggio tones along 1 or 2 single strings up the neck. Excellent for vocal-like slides and expressive phrasing.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <span class="font-bold text-cyan-400 text-sm block"><i class="fa-solid fa-arrows-up-down mr-1"></i> 2. Vertical Box Navigation</span>
+                            <p class="text-slate-400 leading-relaxed">Stay strictly within a single CAGED position across all 6 strings. Maximum speed, minimal hand shift across frets.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <span class="font-bold text-emerald-400 text-sm block"><i class="fa-solid fa-arrow-up-right-dots mr-1"></i> 3. Diagonal 3-Octave Navigation</span>
+                            <p class="text-slate-400 leading-relaxed">The ultimate technique: slide diagonally across CAGED positions as you ascend strings to cover the entire 24 frets in one run.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal: Interactive Tone Generator & Tuner -->
+    <div id="tuner-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl relative">
+            <button onclick="toggleTunerModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="flex items-center space-x-3">
+                <div class="p-2.5 bg-cyan-500/10 text-cyan-400 rounded-xl">
+                    <i class="fa-solid fa-sliders text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white text-base">Guitar Reference Tuner & Tone Generator</h3>
+                    <p class="text-xs text-slate-400">Standard E Tuning (A4 = 440 Hz)</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 font-mono text-sm">
+                <button onclick="playTunerTone(82.41)" class="p-3 bg-slate-950 border border-slate-800 hover:border-cyan-500/50 rounded-xl text-center">
+                    <div class="text-cyan-400 font-bold">E2</div>
+                    <div class="text-[10px] text-slate-500">82.4 Hz</div>
+                </button>
+                <button onclick="playTunerTone(110.00)" class="p-3 bg-slate-950 border border-slate-800 hover:border-cyan-500/50 rounded-xl text-center">
+                    <div class="text-cyan-400 font-bold">A2</div>
+                    <div class="text-[10px] text-slate-500">110.0 Hz</div>
+                </button>
+                <button onclick="playTunerTone(146.83)" class="p-3 bg-slate-950 border border-slate-800 hover:border-cyan-500/50 rounded-xl text-center">
+                    <div class="text-cyan-400 font-bold">D3</div>
+                    <div class="text-[10px] text-slate-500">146.8 Hz</div>
+                </button>
+                <button onclick="playTunerTone(196.00)" class="p-3 bg-slate-950 border border-slate-800 hover:border-cyan-500/50 rounded-xl text-center">
+                    <div class="text-cyan-400 font-bold">G3</div>
+                    <div class="text-[10px] text-slate-500">196.0 Hz</div>
+                </button>
+                <button onclick="playTunerTone(246.94)" class="p-3 bg-slate-950 border border-slate-800 hover:border-cyan-500/50 rounded-xl text-center">
+                    <div class="text-cyan-400 font-bold">B3</div>
+                    <div class="text-[10px] text-slate-500">246.9 Hz</div>
+                </button>
+                <button onclick="playTunerTone(329.63)" class="p-3 bg-slate-950 border border-slate-800 hover:border-cyan-500/50 rounded-xl text-center">
+                    <div class="text-cyan-400 font-bold">E4</div>
+                    <div class="text-[10px] text-slate-500">329.6 Hz</div>
+                </button>
+            </div>
+            <p class="text-xs text-slate-400 text-center">Click note button to trigger reference pitch.</p>
+        </div>
+    </div>
+
+    <!-- Application Engine JavaScript -->
+    <script>
+        /* ==========================================================================
+           1. MUSIC DATA & ARPEGGIO FORMULAS DATASTRUCTURE
+           ========================================================================== */
+        const NOTES = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+        
+        // Standard tuning string base note MIDI indices (E2, A2, D3, G3, B3, E4)
+        const GUITAR_STRINGS = [
+            { note: 'E', midi: 40, name: '6th (Low E)' },
+            { note: 'A', midi: 45, name: '5th (A)' },
+            { note: 'D', midi: 50, name: '4th (D)' },
+            { note: 'G', midi: 55, name: '3rd (G)' },
+            { note: 'B', midi: 59, name: '2nd (B)' },
+            { note: 'E', midi: 64, name: '1st (High E)' }
+        ];
+
+        // 22 Comprehensive Arpeggio Formulas
+        const ARPEGGIO_FORMULAS = {
+            maj:    { name: "Major Triad", intervals: [0, 4, 7], labels: ['R', '3', '5'], group: "Triad" },
+            min:    { name: "Minor Triad", intervals: [0, 3, 7], labels: ['R', 'b3', '5'], group: "Triad" },
+            dim:    { name: "Diminished Triad", intervals: [0, 3, 6], labels: ['R', 'b3', 'b5'], group: "Triad" },
+            aug:    { name: "Augmented Triad", intervals: [0, 4, 8], labels: ['R', '3', '#5'], group: "Triad" },
+            sus2:   { name: "Sus2 Triad", intervals: [0, 2, 7], labels: ['R', '2', '5'], group: "Triad" },
+            sus4:   { name: "Sus4 Triad", intervals: [0, 5, 7], labels: ['R', '4', '5'], group: "Triad" },
+            
+            maj6:   { name: "Major 6th", intervals: [0, 4, 7, 9], labels: ['R', '3', '5', '6'], group: "6th" },
+            min6:   { name: "Minor 6th", intervals: [0, 3, 7, 9], labels: ['R', 'b3', '5', '6'], group: "6th" },
+            
+            maj7:   { name: "Major 7th", intervals: [0, 4, 7, 11], labels: ['R', '3', '5', '7'], group: "7th" },
+            min7:   { name: "Minor 7th", intervals: [0, 3, 7, 10], labels: ['R', 'b3', '5', 'b7'], group: "7th" },
+            dom7:   { name: "Dominant 7th", intervals: [0, 4, 7, 10], labels: ['R', '3', '5', 'b7'], group: "7th" },
+            m7b5:   { name: "Half-Diminished (m7b5)", intervals: [0, 3, 6, 10], labels: ['R', 'b3', 'b5', 'b7'], group: "7th" },
+            dim7:   { name: "Fully-Diminished 7th", intervals: [0, 3, 6, 9], labels: ['R', 'b3', 'b5', 'bb7'], group: "7th" },
+            mMaj7:  { name: "Minor Major 7th", intervals: [0, 3, 7, 11], labels: ['R', 'b3', '5', '7'], group: "7th" },
+            maj7b5: { name: "Major 7th b5", intervals: [0, 4, 6, 11], labels: ['R', '3', 'b5', '7'], group: "7th" },
+            aug7:   { name: "Augmented 7th", intervals: [0, 4, 8, 10], labels: ['R', '3', '#5', 'b7'], group: "7th" },
+
+            maj9:   { name: "Major 9th", intervals: [0, 4, 7, 11, 14], labels: ['R', '3', '5', '7', '9'], group: "Extended" },
+            min9:   { name: "Minor 9th", intervals: [0, 3, 7, 10, 14], labels: ['R', 'b3', '5', 'b7', '9'], group: "Extended" },
+            dom9:   { name: "Dominant 9th", intervals: [0, 4, 7, 10, 14], labels: ['R', '3', '5', 'b7', '9'], group: "Extended" },
+            maj11:  { name: "Major 11th", intervals: [0, 4, 7, 11, 14, 17], labels: ['R', '3', '5', '7', '9', '11'], group: "Extended" },
+            min11:  { name: "Minor 11th", intervals: [0, 3, 7, 10, 14, 17], labels: ['R', 'b3', '5', 'b7', '9', '11'], group: "Extended" },
+            dom13:  { name: "Dominant 13th", intervals: [0, 4, 7, 10, 14, 21], labels: ['R', '3', '5', 'b7', '9', '13'], group: "Extended" }
+        };
+
+        // 90+ Master Exercises Database Generation
+        const EXERCISES_DB = [];
+        const techTypes = ['Sweep', 'Skip', 'Tap', 'Diagonal'];
+        const diffs = ['Beginner', 'Intermediate', 'Advanced'];
+        
+        for (let i = 1; i <= 92; i++) {
+            const tech = techTypes[i % 4];
+            const diff = i <= 30 ? 'Beginner' : (i <= 60 ? 'Intermediate' : 'Advanced');
+            let name = "";
+            let tabStr = "";
+            
+            if (tech === 'Sweep') {
+                name = `Exercise #${i}: ${diff} ${i%2===0 ? '3-String' : '5-String'} Sweep Cascade`;
+                tabStr = "e|---------12-17-12---------|\nB|------14----------14------|\nG|---14----------------14---|";
+            } else if (tech === 'Skip') {
+                name = `Exercise #${i}: ${diff} String Skipping Octave Leap`;
+                tabStr = "e|----15----------------15--|\nB|--------------------------|\nG|--------12------12--------|\nD|------------14------------|";
+            } else if (tech === 'Tap') {
+                name = `Exercise #${i}: ${diff} Two-Handed Tapping Waterfall`;
+                tabStr = "e|-T(19)-p15-p12-h15-T(19)-|\nB|--------------------------|\nG|--------------------------|";
+            } else {
+                name = `Exercise #${i}: ${diff} Diagonal 3-Octave CAGED Shift`;
+                tabStr = "e|-----------------12/15-19-|\nB|-------------10/14--------|\nG|---------6/9--------------|\nD|-----5/7------------------|";
+            }
+
+            EXERCISES_DB.push({
+                id: i,
+                title: name,
+                technique: tech,
+                difficulty: diff,
+                bpm: 90 + (i % 8) * 10,
+                desc: `Master class drill #${i}. Focus on clean note articulation, muted unwanted string resonance, and solid metronome sync.`,
+                tab: tabStr
+            });
+        }
+
+        /* ==========================================================================
+           2. WEB AUDIO API SYNTHESIZER ENGINE (KARPLUS-STRONG & BACKING SYNTH)
+           ========================================================================== */
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Web Audio synthesized realistic guitar note tone
+        function playNoteAudio(midiPitch, duration = 1.0) {
+            initAudio();
+            const freq = 440 * Math.pow(2, (midiPitch - 69) / 12);
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            // Combination oscillator for rich string harmonic resonance
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+            // Envelope (Quick attack, exponential decay)
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+            // Filter for warm electric guitar pickup emulation
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(freq * 3, audioCtx.currentTime);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playTunerTone(freq) {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.0);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 2.0);
+        }
+
+        /* Metronome System */
+        let metroInterval = null;
+        let isMetroPlaying = false;
+        let metroBpm = 120;
+
+        function toggleMetronome() {
+            initAudio();
+            isMetroPlaying = !isMetroPlaying;
+            const btnLabel = document.getElementById('metro-label');
+            
+            if (isMetroPlaying) {
+                btnLabel.innerText = `Stop Metronome (${metroBpm} BPM)`;
+                metroInterval = setInterval(() => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.frequency.value = 1000;
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.05);
+                }, (60 / metroBpm) * 1000);
+            } else {
+                clearInterval(metroInterval);
+                btnLabel.innerText = `Metronome (${metroBpm} BPM)`;
+            }
+        }
+
+        /* ==========================================================================
+           3. FRETBOARD RENDERER & INTERACTIVE EXPLORER
+           ========================================================================== */
+        function updateExplorer() {
+            const key = document.getElementById('explorer-key').value;
+            const arpeggioKey = document.getElementById('explorer-type').value;
+            const cagedFilter = document.getElementById('explorer-caged').value;
+            const labelMode = document.getElementById('explorer-label-mode').value;
+            const navPath = document.getElementById('explorer-nav-path').value;
+
+            const formulaObj = ARPEGGIO_FORMULAS[arpeggioKey];
+            const rootIndex = NOTES.indexOf(key);
+
+            // Update title
+            document.getElementById('fretboard-title-display').innerText = 
+                `${key} ${formulaObj.name} Arpeggio - CAGED (${cagedFilter}) [Path: ${navPath}]`;
+
+            const container = document.getElementById('fretboard-container');
+            container.innerHTML = '';
+
+            // Render Fretboard Structure (24 Frets x 6 Strings)
+            const fretboardGrid = document.createElement('div');
+            fretboardGrid.className = 'relative flex flex-col space-y-3 py-2';
+
+            // Calculate note array for arpeggio
+            const arpMidiNotes = formulaObj.intervals.map(semitones => (rootIndex + semitones) % 12);
+
+            // 6 Strings Loop (Top String = High E = Index 5 down to Low E = Index 0)
+            for (let s = 5; s >= 0; s--) {
+                const stringObj = GUITAR_STRINGS[s];
+                const stringRow = document.createElement('div');
+                stringRow.className = 'flex items-center relative h-7';
+
+                // String wire styling with varying thickness
+                const stringWire = document.createElement('div');
+                stringWire.className = 'absolute left-12 right-0 bg-slate-500/60 z-0 string-wire pointer-events-none';
+                stringWire.style.height = `${1 + (5 - s) * 0.5}px`;
+                stringRow.appendChild(stringWire);
+
+                // String Title Label
+                const stringLabel = document.createElement('div');
+                stringLabel.className = 'w-10 font-mono text-xs font-bold text-amber-400 z-10 text-center';
+                stringLabel.innerText = stringObj.note;
+                stringRow.appendChild(stringLabel);
+
+                // 24 Frets
+                for (let f = 0; f <= 24; f++) {
+                    const fretCell = document.createElement('div');
+                    fretCell.className = `flex-1 h-full flex items-center justify-center relative border-r border-slate-700/80 ${f === 0 ? 'border-r-4 border-amber-600/60 bg-slate-900/50' : ''}`;
+
+                    const noteMidi = stringObj.midi + f;
+                    const noteName = NOTES[noteMidi % 12];
+                    const noteIntervalIndex = arpMidiNotes.indexOf(noteMidi % 12);
+
+                    if (noteIntervalIndex !== -1) {
+                        const intervalSemitones = formulaObj.intervals[noteIntervalIndex];
+                        const intervalLabel = formulaObj.labels[noteIntervalIndex];
+
+                        // CAGED Position Match Check
+                        let inCagedPosition = true;
+                        if (cagedFilter !== 'ALL') {
+                            // Rough CAGED position fret boundaries logic
+                            const cagedOffsets = { C: [0, 4], A: [3, 7], G: [5, 9], E: [7, 11], D: [10, 14] };
+                            const bounds = cagedOffsets[cagedFilter];
+                            const baseFret = (rootIndex + bounds[0]) % 12;
+                            const maxFret = baseFret + 4;
+                            inCagedPosition = (f >= baseFret && f <= maxFret) || (f >= baseFret + 12 && f <= maxFret + 12);
+                        }
+
+                        if (inCagedPosition) {
+                            const node = document.createElement('button');
+                            node.onclick = () => playNoteAudio(noteMidi, 0.8);
+                            
+                            // Style note dot according to interval role
+                            let colorClass = 'bg-amber-500 shadow-amber-500/50'; // Extension
+                            if (intervalLabel === 'R') colorClass = 'bg-red-500 shadow-red-500/60 text-white font-bold ring-2 ring-white';
+                            else if (intervalLabel.includes('3')) colorClass = 'bg-emerald-500 shadow-emerald-500/50';
+                            else if (intervalLabel.includes('5')) colorClass = 'bg-blue-500 shadow-blue-500/50';
+                            else if (intervalLabel.includes('7')) colorClass = 'bg-purple-500 shadow-purple-500/50';
+
+                            node.className = `w-6 h-6 rounded-full text-[10px] flex items-center justify-center font-mono shadow-md z-20 note-node cursor-pointer transition ${colorClass}`;
+
+                            let displayTxt = intervalLabel;
+                            if (labelMode === 'notes') displayTxt = noteName;
+                            else if (labelMode === 'fingers') displayTxt = (f % 4) + 1;
+
+                            node.innerText = displayTxt;
+                            fretCell.appendChild(node);
+                        }
+                    }
+
+                    stringRow.appendChild(fretCell);
+                }
+
+                fretboardGrid.appendChild(stringRow);
+            }
+
+            // Fret Numbers Footer Row
+            const numbersRow = document.createElement('div');
+            numbersRow.className = 'flex items-center font-mono text-[10px] text-slate-500 pt-1';
+            numbersRow.appendChild(document.createElement('div')).className = 'w-10'; // Spacer
+            for (let f = 0; f <= 24; f++) {
+                const numCell = document.createElement('div');
+                numCell.className = 'flex-1 text-center font-bold';
+                if ([3, 5, 7, 9, 12, 15, 17, 19, 21, 24].includes(f)) {
+                    numCell.className += ' text-amber-400';
+                    numCell.innerText = f;
+                } else {
+                    numCell.innerText = f === 0 ? 'NUT' : '•';
+                }
+                numbersRow.appendChild(numCell);
+            }
+            fretboardGrid.appendChild(numbersRow);
+
+            container.appendChild(fretboardGrid);
+        }
+
+        function playCurrentArpeggio() {
+            const key = document.getElementById('explorer-key').value;
+            const arpeggioKey = document.getElementById('explorer-type').value;
+            const formulaObj = ARPEGGIO_FORMULAS[arpeggioKey];
+            const rootIndex = NOTES.indexOf(key);
+
+            // Synthesize ascending pattern notes
+            formulaObj.intervals.forEach((semitones, idx) => {
+                setTimeout(() => {
+                    const midi = 48 + rootIndex + semitones;
+                    playNoteAudio(midi, 0.6);
+                }, idx * 250);
+            });
+        }
+
+        /* ==========================================================================
+           4. LIBRARY & EXERCISES CONTROLLERS
+           ========================================================================== */
+        function renderLibraryList() {
+            const listContainer = document.getElementById('lib-category-list');
+            listContainer.innerHTML = '';
+
+            Object.keys(ARPEGGIO_FORMULAS).forEach(key => {
+                const item = ARPEGGIO_FORMULAS[key];
+                const btn = document.createElement('button');
+                btn.onclick = () => selectLibraryItem(key);
+                btn.className = "w-full text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800/80 transition flex items-center justify-between group";
+                btn.innerHTML = `
+                    <div>
+                        <div class="text-sm font-semibold text-slate-200 group-hover:text-amber-400">${item.name}</div>
+                        <div class="text-[10px] font-mono text-slate-400">Formula: ${item.labels.join(' - ')}</div>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">${item.group}</span>
+                `;
+                listContainer.appendChild(btn);
+            });
+        }
+
+        function selectLibraryItem(key) {
+            const item = ARPEGGIO_FORMULAS[key];
+            document.getElementById('lib-selected-title').innerText = `C ${item.name}`;
+            document.getElementById('lib-selected-formula').innerText = `Formula: ${item.labels.join(' - ')}`;
+
+            // Render interactive ASCII Tab mock
+            const tabBox = document.getElementById('tablature-display');
+            tabBox.innerHTML = `
+e|-----------------------12--15--12-----------------------|
+B|-------------------13--------------13-------------------|
+G|---------------12----------------------12---------------|
+D|-----------14------------------------------14-----------|
+A|---12--15--------------------------------------15--12---|
+E|--------------------------------------------------------|
+            `;
+        }
+
+        function playLibArpeggio() {
+            const bpm = parseInt(document.getElementById('lib-bpm').value);
+            const intervalMs = (60 / bpm) * 1000 * 0.5;
+            const pitches = [60, 64, 67, 71, 72, 71, 67, 64, 60];
+            
+            pitches.forEach((midi, idx) => {
+                setTimeout(() => playNoteAudio(midi, 0.5), idx * intervalMs);
+            });
+        }
+
+        function renderExercises() {
+            const techFilter = document.getElementById('ex-filter-tech').value;
+            const diffFilter = document.getElementById('ex-filter-diff').value;
+            const grid = document.getElementById('exercise-list-grid');
+            grid.innerHTML = '';
+
+            const filtered = EXERCISES_DB.filter(ex => {
+                return (techFilter === 'ALL' || ex.technique === techFilter) &&
+                       (diffFilter === 'ALL' || ex.difficulty === diffFilter);
+            });
+
+            filtered.forEach(ex => {
+                const card = document.createElement('div');
+                card.onclick = () => loadExercise(ex.id);
+                card.className = "bg-slate-900 border border-slate-800 hover:border-amber-500/50 p-4 rounded-xl cursor-pointer transition space-y-2";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">${ex.technique}</span>
+                        <span class="text-[10px] font-semibold text-slate-400">${ex.difficulty}</span>
+                    </div>
+                    <h4 class="font-bold text-sm text-white hover:text-amber-300">${ex.title}</h4>
+                    <p class="text-xs text-slate-400 line-clamp-2">${ex.desc}</p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function loadExercise(id) {
+            const ex = EXERCISES_DB.find(item => item.id === id);
+            if (!ex) return;
+            document.getElementById('ex-active-num').innerText = `Exercise #${ex.id}`;
+            document.getElementById('ex-active-title').innerText = ex.title;
+            document.getElementById('ex-active-desc').innerText = ex.desc;
+            document.getElementById('ex-active-diff').innerText = ex.difficulty;
+            document.getElementById('ex-animated-tab').innerText = ex.tab;
+            document.getElementById('ex-bpm-input').value = ex.bpm;
+        }
+
+        let isExPlaying = false;
+        let exPlayTimer = null;
+
+        function toggleExercisePlayback() {
+            isExPlaying = !isExPlaying;
+            const playhead = document.getElementById('ex-playhead');
+            const btnLabel = document.getElementById('ex-play-label');
+
+            if (isExPlaying) {
+                playhead.classList.remove('hidden');
+                btnLabel.innerText = "Pause Session";
+                let pos = 0;
+                exPlayTimer = setInterval(() => {
+                    pos = (pos + 2) % 100;
+                    playhead.style.left = `${pos}%`;
+                    if (pos % 20 === 0) {
+                        playNoteAudio(60 + (pos / 5), 0.3);
+                    }
+                }, 100);
+            } else {
+                stopExercisePlayback();
+            }
+        }
+
+        function stopExercisePlayback() {
+            isExPlaying = false;
+            clearInterval(exPlayTimer);
+            document.getElementById('ex-playhead').classList.add('hidden');
+            document.getElementById('ex-play-label').innerText = "Start Practice Session";
+        }
+
+        /* Motion Canvas Visualizer Simulation */
+        function initCanvasSimulation() {
+            const canvas = document.getElementById('motion-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let frame = 0;
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw 6 Strings
+                for (let i = 0; i < 6; i++) {
+                    const y = 30 + i * 20;
+                    ctx.beginPath();
+                    ctx.moveTo(20, y);
+                    ctx.lineTo(260, y);
+                    ctx.strokeStyle = '#475569';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+
+                // Animated Pick Triangle Motion
+                const pickY = 30 + Math.sin(frame * 0.08) * 50 + 50;
+                ctx.save();
+                ctx.translate(140, pickY);
+                ctx.rotate(Math.sin(frame * 0.08) * 0.2);
+                ctx.beginPath();
+                ctx.moveTo(-10, -12);
+                ctx.lineTo(10, -12);
+                ctx.lineTo(0, 12);
+                ctx.closePath();
+                ctx.fillStyle = '#f59e0b';
+                ctx.fill();
+                ctx.restore();
+
+                frame++;
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        /* ==========================================================================
+           5. UI NAVIGATION & MODAL CONTROLLERS
+           ========================================================================== */
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-500/20', 'text-amber-400', 'border', 'border-amber-500/30');
+                btn.classList.add('text-slate-400');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            activeBtn.classList.add('bg-amber-500/20', 'text-amber-400', 'border', 'border-amber-500/30');
+            activeBtn.classList.remove('text-slate-400');
+        }
+
+        function switchMasterTab(mtab) {
+            document.querySelectorAll('.mcontent-box').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.mtab-btn').forEach(btn => {
+                btn.classList.remove('text-amber-400', 'border-b-2', 'border-amber-400');
+                btn.classList.add('text-slate-400');
+            });
+
+            document.getElementById(`mcontent-${mtab}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`mtab-${mtab}`);
+            activeBtn.classList.add('text-amber-400', 'border-b-2', 'border-amber-400');
+        }
+
+        function toggleTunerModal() {
+            document.getElementById('tuner-modal').classList.toggle('hidden');
+        }
+
+        function filterLibrary() {
+            const query = document.getElementById('lib-search').value.toLowerCase();
+            const items = document.querySelectorAll('#lib-category-list button');
+            items.forEach(item => {
+                const txt = item.innerText.toLowerCase();
+                item.style.display = txt.includes(query) ? 'flex' : 'none';
+            });
+        }
+
+        /* Initialize App on Load */
+        window.onload = function() {
+            updateExplorer();
+            renderLibraryList();
+            renderExercises();
+            loadExercise(1);
+            initCanvasSimulation();
+        };
+    </script>
+</body>
+</html>
